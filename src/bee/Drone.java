@@ -38,7 +38,13 @@ public class Drone extends Bee {
      * simulation and they should end their run without any
      * sleeping.
      */
+    public void setMated(){
+
+    }
+
     public void run() {
-        // TODO
+        if (this.beeHive.isActive()){
+            this.beeHive.getQueensChamber().enterChamber(this);
+        }
     }
 }

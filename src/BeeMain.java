@@ -85,7 +85,7 @@ public class BeeMain {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        if (args.length != 4) {
+        /*if (args.length != 4) {
             System.out.println("Usage: java BeeMain seconds drones nectar_workers pollen_workers");
         } else {
             new BeeMain(
@@ -94,6 +94,7 @@ public class BeeMain {
                     Integer.parseInt(args[2]), // #nectar_workers
                     Integer.parseInt(args[3])  // #pollen_workers
             ).go();
-        }
+        }*/
+        new BeeMain(10, 0, 2, 2).go();
     }
 }

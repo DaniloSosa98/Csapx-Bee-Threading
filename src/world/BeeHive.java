@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Sean Strout @ RIT CS
  * @author YOUR NAME HERE
  */
-public class BeeHive {
+public class BeeHive extends Object{
     /** the field of flowers */
     private FlowerField flowerField;
     /** the queen's chamber */
@@ -57,14 +57,18 @@ public class BeeHive {
         this.nectar = this.pollen = 0;
 
         // create the bees!
+        this.bees.add(Bee.createBee(Role.QUEEN, Resource.NONE, this));
+
+        for (int i = 0; i <numDrones ; i++) {
+            this.bees.add(Bee.createBee(Role.DRONE, Resource.NONE, this));
+        }
+
         for (int i=0; i<numNectarWorkers; ++i ) {
             this.bees.add(Bee.createBee(Role.WORKER, Resource.NECTAR, this));
         }
         for (int i=0; i<numPollenWorkers; ++i ) {
             this.bees.add(Bee.createBee(Role.WORKER, Resource.POLLEN, this));
         }
-
-        // TODO create queen and drone bees
 
         this.active = true;
         this.numBorn = this.bees.size();
@@ -166,7 +170,9 @@ public class BeeHive {
      */
     public void begin() {
         System.out.println("*BH* Bee hive begins buzzing!");
-        // TODO
+        for (Bee b: this.bees) {
+            b.start();
+        }
     }
 
     /**
@@ -191,7 +197,13 @@ public class BeeHive {
         // flip the switch
         this.active = false;
 
-        // TODO
+        for (Bee b: this.bees) {
+            try{
+                b.join();
+            }catch(InterruptedException e) {
+                System.out.println(e);
+            }
+        }
 
         System.out.println("*BH* Bee hive stops buzzing!");
     }
@@ -204,7 +216,8 @@ public class BeeHive {
      * @param bee the bee who perished
      */
     public synchronized void beePerished (Bee bee){
-        // TODO
+        this.perishedBees.add(bee);
+        System.out.println(bee + " has perished!");
     }
 
     /**
@@ -214,7 +227,7 @@ public class BeeHive {
      * @param bee the new bee
      */
     public synchronized void addBee(Bee bee) {
-        // TODO
+        this.bees.add(bee);
     }
 
     /**
@@ -224,7 +237,9 @@ public class BeeHive {
      * @return do we have enough resources?
      */
     public synchronized boolean hasResources() {
-        // TODO
+        if (this.getRemainingNectar()>=1 && this.getRemainingPollen()>=1) {
+            return true;
+        }
         return false;
     }
 
@@ -235,7 +250,10 @@ public class BeeHive {
      * @rit.pre {@link BeeHive#hasResources()} is true
      */
     public synchronized void claimResources() {
-        // TODO
+        if (this.hasResources()){
+            this.nectar--;
+            this.pollen--;
+        }
     }
 
     /**
@@ -252,7 +270,18 @@ public class BeeHive {
      * @rit.pre the bee hive is still active
      */
     public synchronized void deposit(Resource resource, Worker bee) {
-        System.out.println("*BH* " + bee + " deposits");
-        // TODO
+        if(this.isActive()){
+            System.out.println("*BH* " + bee + " deposits " + resource);
+            if(resource == Resource.NECTAR){
+                this.nectar++;
+                this.nectarGathered++;
+            }else if(resource == Resource.POLLEN){
+                this.pollen++;
+                this.pollenGathered++;
+            }else{
+                System.out.println("Neither pollen or nectar!");
+            }
+        }
+
     }
 }

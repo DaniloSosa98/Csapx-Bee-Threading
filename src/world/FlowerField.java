@@ -11,7 +11,7 @@ import bee.Worker;
  * @author Sean Strout @ RIT CS
  * @author YOUR NAME HERE
  */
-public class FlowerField {
+public class FlowerField extends Object{
     /** the maximum number of workers allowed in the field at the same time */
     public final static int MAX_WORKERS = 10;
 
@@ -38,8 +38,15 @@ public class FlowerField {
      * @param worker the worker bee entering the field
      */
     public synchronized void enterField(Worker worker) {
+        while (this.numWorkers>=this.MAX_WORKERS){
+            try{
+                wait();
+            }catch(InterruptedException e){
+                System.out.println(e);
+            }
+        }
         System.out.println("*FF* " + worker + " enters field");
-        // TODO
+        this.numWorkers++;
     }
 
     /**
@@ -54,7 +61,8 @@ public class FlowerField {
      * @param worker the worker bee leaving the field
      */
     public synchronized void exitField(Worker worker) {
-        // TODO
+        this.numWorkers--;
+        notify();
         System.out.println("*FF* " + worker + " leaves field");
     }
 }

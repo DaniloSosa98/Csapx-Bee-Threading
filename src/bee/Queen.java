@@ -1,5 +1,6 @@
 package bee;
 
+import util.RandomBee;
 import world.BeeHive;
 
 /**
@@ -65,6 +66,60 @@ public class Queen extends Bee {
      * still waiting in her chamber.
      */
     public void run() {
-        // TODO
+
+        while(this.beeHive.isActive()){
+
+            if (this.beeHive.hasResources() && this.beeHive.getQueensChamber().hasDrone()){
+
+                this.beeHive.getQueensChamber().summonDrone();
+                try {
+                    this.sleep(this.MATE_TIME_MS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                int borned = RandomBee.nextInt(this.MIN_NEW_BEES, this.MAX_NEW_BEES);
+                int total = 0;
+
+                if(this.beeHive.getRemainingPollen()>=borned && this.beeHive.getRemainingNectar()>=borned){
+
+                    for (int i = 0; i <borned ; i++) {
+                        int percent = RandomBee.nextInt(1,100);
+                        if(percent<=20){
+                            this.beeHive.addBee(Bee.createBee(Role.WORKER, Worker.Resource.NECTAR, this.beeHive));
+                        }else if(percent>20 && percent<=40){
+                            this.beeHive.addBee(Bee.createBee(Role.WORKER, Worker.Resource.POLLEN, this.beeHive));
+                        }else{
+                            this.beeHive.addBee(Bee.createBee(Role.DRONE, Worker.Resource.NONE, this.beeHive));
+                        }
+                        this.beeHive.claimResources();
+                        total++;
+                    }
+                }else{
+                    for (int i = 0; i < Math.min(this.beeHive.getRemainingNectar(), this.beeHive.getRemainingPollen()); i++) {
+                        int percent = RandomBee.nextInt(1,100);
+                        if(percent<=20){
+                            this.beeHive.addBee(Bee.createBee(Role.WORKER, Worker.Resource.NECTAR, this.beeHive));
+                        }else if(percent>20 && percent<=40){
+                            this.beeHive.addBee(Bee.createBee(Role.WORKER, Worker.Resource.POLLEN, this.beeHive));
+                        }else{
+                            this.beeHive.addBee(Bee.createBee(Role.DRONE, Worker.Resource.NONE, this.beeHive));
+                        }
+                        this.beeHive.claimResources();
+                        total++;
+                    }
+                }
+
+                System.out.println("*Q* Queen birthed " + total + " children" );
+                this.beeHive.getQueensChamber().dismissDrone();
+
+            }
+
+            try {
+                this.sleep(this.SLEEP_TIME_MS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
