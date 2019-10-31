@@ -39,7 +39,8 @@ public class Drone extends Bee {
      * sleeping.
      */
     public void setMated(){
-
+        System.out.println("*D* " + this + " has perished!");
+        this.beeHive.getPerishedBees().add(this);
     }
 
     public void run() {

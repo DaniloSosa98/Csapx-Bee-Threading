@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author YOUR NAME HERE
  */
 public class QueensChamber extends Object{
-    private ConcurrentLinkedQueue<Bee> drones;
+    private ConcurrentLinkedQueue<Drone> drones;
 
     public QueensChamber() {
         this.drones = new ConcurrentLinkedQueue<>();
@@ -27,15 +27,26 @@ public class QueensChamber extends Object{
     public synchronized void enterChamber(Drone drone){
         System.out.println("*QC*" + drone + " enters chamber");
         drones.add(drone);
+        while(!this.drones.peek().equals(drone)){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.summonDrone();
+        this.dismissDrone();
 
+        System.out.println("*QC* {bee}" + drone + " leaves chamber");
     }
 
     public synchronized  void summonDrone(){
-
+        System.out.println("*QC* Queen mates with " + this.drones.peek());
+        notify();
     }
 
     public synchronized void dismissDrone(){
-
+        this.drones.poll().setMated();
     }
 
     public synchronized boolean hasDrone(){
